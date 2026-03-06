@@ -1,0 +1,12 @@
+[[redirects]]
+  from = "/data/rankings.json"
+    to = "/data/rankings.json"
+      status = 200
+        force = true  # Opcional, mas ajuda a evitar cache em alguns casos
+
+        [build]
+          command = ""  # Deixe vazio, pois é site estático sem build
+            publish = "."  # Pasta raiz do projeto
+
+            [functions]
+              directory = "netlify/functions"  # Onde fica a pasta das functions
