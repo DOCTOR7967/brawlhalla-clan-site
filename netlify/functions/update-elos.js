@@ -14,9 +14,9 @@ exports.handler = schedule('@daily', async () => {
 
                   const updated = [];
 
-                      // Para cada membro, busca os dados na API
+                   // Para cada membro, busca os dados na API
                           for (const member of members) {
-                                const url = `https://api.brawlhalla.com/player/\( {member.bhid}/ranked?api_key= \){API_KEY}`;
+                                const url = `https://brawlhalla-corehalla-proxy.vercel.app/player/${member.bhid}/ranked`;
                                       const res = await fetch(url);
 
                                             if (!res.ok) {
