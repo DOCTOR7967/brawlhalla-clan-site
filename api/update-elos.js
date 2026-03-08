@@ -1,24 +1,26 @@
 module.exports = async (req, res) => {
   try {
+    // Lista de membros (você pode manter hardcoded para teste ou ler de members.json depois)
     const members = [
       { nome: "Old_kaiser_", bhid: 122711961 }
-      // adicione mais membros aqui se quiser
+      // Adicione mais membros aqui se quiser:
+      // { nome: "Amigol", bhid: 12345678 },
     ];
 
     const updated = [];
 
     for (const member of members) {
-      // Proxy alternativo estável (testado agora - usa Brawlhalla Tracker API wrapper)
-      const url = `https://api.tracker.gg/api/v2/brawlhalla/standard/profile/${member.bhid}`;  // Tracker.gg não exige key para ranked básico
+      // Proxy Tracker.gg (mais estável e sem bloqueio frequente em 2026)
+      const url = `https://api.tracker.gg/api/v2/brawlhalla/standard/profile/${member.bhid}`;
 
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; Brawlhalla-Clan/1.0)'  // evita bloqueio
+          'User-Agent': 'Brawlhalla-Clan-App/1.0 (Personal Project)'  // evita bloqueio como bot
         }
       });
 
       if (!response.ok) {
-        console.error(`Erro na API para BHID ${member.bhid}: ${response.status}`);
+        console.error(`Erro Tracker.gg para BHID ${member.bhid}: ${response.status}`);
         updated.push({
           nome: member.nome,
           bhid: member.bhid,
@@ -27,20 +29,21 @@ module.exports = async (req, res) => {
         continue;
       }
 
-      const data = await response.json();
+      const json = await response.json();
 
-      // Tracker.gg retorna dados em data.data.segments[0].stats ou similar - ajuste conforme o JSON
-      const rankedData = data.data.segments?.find(s => s.type === 'ranked')?.stats || {};
+      // Tracker.gg retorna dados em json.data.segments (ranked está em segments com type 'ranked')
+      const rankedSegment = json.data.segments?.find(s => s.type === 'ranked') || {};
+      const stats = rankedSegment.stats || {};
 
       updated.push({
         nome: member.nome,
         bhid: member.bhid,
-        rating: rankedData.rating?.value || 'N/A',
-        peak_rating: rankedData.peak_rating?.value || 'N/A',
-        tier: rankedData.tier?.value || 'N/A',
-        region: rankedData.region?.value || 'N/A',
-        wins: rankedData.wins?.value || 0,
-        games: rankedData.games?.value || 0
+        rating: stats.rating?.value || 'N/A',
+        peak_rating: stats.peak_rating?.value || 'N/A',
+        tier: stats.tier?.metadata?.name || 'N/A',
+        region: stats.region?.metadata?.name || 'N/A',
+        wins: stats.wins?.value || 0,
+        games: stats.games?.value || 0
       });
     }
 
