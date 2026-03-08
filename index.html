@@ -2,95 +2,101 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Clã XYZ - Brawlhalla</title>
-        <style>
-            body {
-                  font-family: Arial, sans-serif;
-                        margin: 15px;
-                              background: #0d1117;
-                                    color: #c9d1d9;
-                                          text-align: center;
-                                              }
-                                                  h1 {
-                                                        color: #58a6ff;
-                                                            }
-                                                                table {
-                                                                      border-collapse: collapse;
-                                                                            width: 100%;
-                                                                                  margin: 20px auto;
-                                                                                        max-width: 600px;
-                                                                                              background: #161b22;
-                                                                                                    border: 1px solid #30363d;
-                                                                                                        }
-                                                                                                            th, td {
-                                                                                                                  border: 1px solid #30363d;
-                                                                                                                        padding: 12px;
-                                                                                                                              text-align: left;
-                                                                                                                                  }
-                                                                                                                                      th {
-                                                                                                                                            background: #21262d;
-                                                                                                                                                  color: #58a6ff;
-                                                                                                                                                      }
-                                                                                                                                                          tr:nth-child(even) {
-                                                                                                                                                                background: #0d1117;
-                                                                                                                                                                    }
-                                                                                                                                                                        .error {
-                                                                                                                                                                              color: #f85149;
-                                                                                                                                                                                  }
-                                                                                                                                                                                    </style>
-                                                                                                                                                                                    </head>
-                                                                                                                                                                                    <body>
-                                                                                                                                                                                      <h1>Clã XYZ - Elos Atualizados</h1>
-                                                                                                                                                                                        <p id="atualizado">Carregando dados... (atualiza a cada 24h)</p>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clã XYZ - Elos Atualizados</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00ff88;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background-color: #222;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #444;
+    }
+    th {
+      background-color: #00ff88;
+      color: black;
+    }
+    tr:hover {
+      background-color: #333;
+    }
+    .loading, .error {
+      text-align: center;
+      font-size: 1.2em;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Clã XYZ - Elos Atualizados</h1>
 
-                                                                                                                                                                                          <table id="membros">
-                                                                                                                                                                                              <thead>
-                                                                                                                                                                                                    <tr>
-                                                                                                                                                                                                            <th>Nome</th>
-                                                                                                                                                                                                                    <th>Elo (Rating)</th>
-                                                                                                                                                                                                                            <th>Tier</th>
-                                                                                                                                                                                                                                    <th>Região</th>
-                                                                                                                                                                                                                                          </tr>
-                                                                                                                                                                                                                                              </thead>
-                                                                                                                                                                                                                                                  <tbody></tbody>
-                                                                                                                                                                                                                                                    </table>
+  <table id="membros">
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Elo (Rating)</th>
+        <th>Tier</th>
+        <th>Região</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- A tabela será preenchida automaticamente -->
+    </tbody>
+  </table>
 
-                                                                                                                                                                                                                                                      <script>
-                                                                                                                                                                                                                                                          fetch('/data/rankings.json')
-                                                                                                                                                                                                                                                                .then(response => {
-                                                                                                                                                                                                                                                                        if (!response.ok) {
-                                                                                                                                                                                                                                                                                  throw new Error('Erro ao carregar os dados');
-                                                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                                                                  return response.json();
-                                                                                                                                                                                                                                                                                                        })
-                                                                                                                                                                                                                                                                                                              .then(data => {
-                                                                                                                                                                                                                                                                                                                      const tbody = document.querySelector('#membros tbody');
-                                                                                                                                                                                                                                                                                                                              const atualizado = document.getElementById('atualizado');
-                                                                                                                                                                                                                                                                                                                                      
-                                                                                                                                                                                                                                                                                                                                              if (data.length === 0) {
-                                                                                                                                                                                                                                                                                                                                                        atualizado.textContent = 'Nenhum membro encontrado ainda.';
-                                                                                                                                                                                                                                                                                                                                                                  return;
-                                                                                                                                                                                                                                                                                                                                                                          }
+  <div class="loading" id="loading">Carregando dados dos elos...</div>
+  <div class="error" id="error" style="display:none;"></div>
 
-                                                                                                                                                                                                                                                                                                                                                                                  data.forEach(member => {
-                                                                                                                                                                                                                                                                                                                                                                                            const tr = document.createElement('tr');
-                                                                                                                                                                                                                                                                                                                                                                                                      tr.innerHTML = `
-                                                                                                                                                                                                                                                                                                                                                                                                                  <td>${member.nome}</td>
-                                                                                                                                                                                                                                                                                                                                                                                                                              <td>${member.rating || 'N/A'}</td>
-                                                                                                                                                                                                                                                                                                                                                                                                                                          <td>${member.tier || 'N/A'}</td>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                      <td>${member.region || 'N/A'}</td>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                `;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          tbody.appendChild(tr);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  });
+  <script>
+    const loading = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+    const tbody = document.querySelector('#membros tbody');
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          atualizado.textContent = 'Dados carregados! (atualiza automaticamente todo dia)';
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                })
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      .catch(error => {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              console.error('Erro:', error);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      document.getElementById('atualizado').textContent = 'Erro ao carregar os elos. Tente novamente mais tarde.';
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              document.getElementById('atualizado').classList.add('error');
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    });
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </script>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </body>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </html>
+    fetch('/api/update-elos')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro na function: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(result => {
+        loading.style.display = 'none';
+
+        if (result.data && result.data.length > 0) {
+          result.data.forEach(member => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${member.nome || 'N/A'}</td>
+              <td>${member.rating || 'N/A'}</td>
+              <td>${member.tier || 'N/A'}</td>
+              <td>${member.region || 'N/A'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = '<tr><td colspan="4">Nenhum dado encontrado</td></tr>';
+        }
+      })
+      .catch(err => {
+        loading.style.display = 'none';
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'Erro ao carregar os elos: ' + err.message;
+        console.error('Erro completo:', err);
+      });
+  </script>
+</body>
+</html>
