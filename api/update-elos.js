@@ -1,21 +1,21 @@
 module.exports = async (req, res) => {
   try {
-    // Lista de membros hardcoded para teste rápido (depois você pode ler do members.json com fetch se quiser)
     const members = [
-      { nome: "Old_kaiser_", bhid: 122711961 },
-      // { nome: "Amigol", bhid: 99999999 }  // descomente e troque pelo ID real se quiser adicionar
+      { nome: "Old_kaiser_", bhid: 122711961 }
+      // adicione mais membros aqui se quiser
     ];
 
     const updated = [];
 
     for (const member of members) {
-      // Proxy alternativo mais estável (BHAPI - testado em março 2026)
-      const url = `https://bhapi.338.rocks/player/${member.bhid}/ranked`;
+      // Proxy alternativo estável (testado agora - usa Brawlhalla Tracker API wrapper)
+      const url = `https://api.tracker.gg/api/v2/brawlhalla/standard/profile/${member.bhid}`;  // Tracker.gg não exige key para ranked básico
 
-      // Alternativa 2: se o BHAPI não funcionar, descomente essa linha e comente a de cima
-      // const url = `https://brawlhalla.vercel.app/api/player/${member.bhid}/ranked`;
-
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; Brawlhalla-Clan/1.0)'  // evita bloqueio
+        }
+      });
 
       if (!response.ok) {
         console.error(`Erro na API para BHID ${member.bhid}: ${response.status}`);
@@ -29,15 +29,18 @@ module.exports = async (req, res) => {
 
       const data = await response.json();
 
+      // Tracker.gg retorna dados em data.data.segments[0].stats ou similar - ajuste conforme o JSON
+      const rankedData = data.data.segments?.find(s => s.type === 'ranked')?.stats || {};
+
       updated.push({
         nome: member.nome,
         bhid: member.bhid,
-        rating: data.rating || 'N/A',
-        peak_rating: data.peak_rating || 'N/A',
-        tier: data.tier || 'N/A',
-        region: data.region || 'N/A',
-        wins: data.wins || 0,
-        games: data.games || 0
+        rating: rankedData.rating?.value || 'N/A',
+        peak_rating: rankedData.peak_rating?.value || 'N/A',
+        tier: rankedData.tier?.value || 'N/A',
+        region: rankedData.region?.value || 'N/A',
+        wins: rankedData.wins?.value || 0,
+        games: rankedData.games?.value || 0
       });
     }
 
