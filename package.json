@@ -1,11 +1,12 @@
 {
-    "name": "brawlhalla-clan-site",
-      "version": "1.0.0",
-        "private": true,
-          "dependencies": {
-              "@netlify/functions": "^2.0.0"
-                },
-                  "engines": {
-                      "node": "24.x"
-                        }
-                        }
+  "name": "brawlhalla-clan-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
