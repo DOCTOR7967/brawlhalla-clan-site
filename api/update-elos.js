@@ -18,16 +18,16 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 pega membros da guilda REAL
+// 🔥 PEGAR MEMBROS CORRETO DA GUILDA
 async function getGuildMembers(guildId) {
   const data = await fetchJson(
-    `https://api.brawlhalla.com/v1/guild/${guildId}`
+    `https://api.brawlhalla.com/v1/guild/members?guild_id=${guildId}`
   );
 
-  return data?.guild?.members || [];
+  return data?.guild_members || [];
 }
 
-// 🔥 ranked 1v1 real
+// 🔥 RANKED 1v1
 async function getRanked(id) {
   const data = await fetchJson(
     `https://api.brawlhalla.com/player/${id}/ranked`
@@ -37,6 +37,7 @@ async function getRanked(id) {
     id,
     name: data?.name || "Desconhecido",
     elo: data?.rating || 0,
+    peak: data?.peak_rating || 0,
     wins: data?.wins || 0,
     games: data?.games || 0,
     winrate: data?.games
@@ -45,13 +46,17 @@ async function getRanked(id) {
   };
 }
 
+// 🔥 EXPORT VERCEL (OBRIGATÓRIO)
 export default async function handler(req, res) {
   try {
-    const guildId = "2616831"; // seu clã
+    const guildId = "2616831";
 
     const members = await getGuildMembers(guildId);
 
-    if (!members.length) {
+    // 🔥 DEBUG IMPORTANTE
+    console.log("MEMBROS DA GUILDA:", members);
+
+    if (!members || members.length === 0) {
       return res.status(200).json([]);
     }
 
@@ -60,7 +65,7 @@ export default async function handler(req, res) {
     );
 
     const top12 = ranked
-      .filter(p => p && p.elo > 0)
+      .filter((p) => p && p.elo > 0)
       .sort((a, b) => b.elo - a.elo)
       .slice(0, 12)
       .map((p, i) => ({
