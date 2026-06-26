@@ -5,17 +5,11 @@ function fetchJson(url) {
     https.get(url, (resp) => {
       let data = "";
 
-      resp.on("data", (chunk) => {
-        data += chunk;
-      });
+      resp.on("data", (c) => (data += c));
 
       resp.on("end", () => {
         try {
-          if (resp.statusCode !== 200) {
-            resolve(null);
-            return;
-          }
-
+          if (resp.statusCode !== 200) return resolve(null);
           resolve(JSON.parse(data));
         } catch {
           resolve(null);
@@ -27,14 +21,14 @@ function fetchJson(url) {
 
 function normalizePlayer(p) {
   return {
-    id: p?.brawlhalla_id || null,
+    id: p?.brawlhalla_id,
     name: p?.name || "Unknown",
 
-    elo: p?.rating || p?.classificacao || 0,
-    peakElo: p?.peak_rating || 0,
+    // 🔥 AQUI ESTÁ O CORRETO (ranked)
+    elo: p?.rating || p?.peak_rating || 0,
 
+    peakElo: p?.peak_rating || 0,
     tier: p?.tier || "N/A",
-    region: p?.region || p?.regiao || "N/A",
 
     wins: p?.wins || 0,
     games: p?.games || 0,
@@ -45,8 +39,6 @@ function normalizePlayer(p) {
   };
 }
 
-const DEFAULT_IDS = ["81437113"];
-
 export default async function handler(req, res) {
   try {
     const apiKey = process.env.BRAWLHALLA_API_KEY;
@@ -55,40 +47,28 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Missing API Key" });
     }
 
-    let { ids } = req.query;
+    const ids = (req.query.ids || "81437113").split(",");
 
-    if (!ids) {
-      ids = DEFAULT_IDS.join(",");
-    }
-
-    const idList = ids.split(",");
-
-    const rawPlayers = (
-      await Promise.all(
-        idList.map((id) =>
-          fetchJson(
-            `https://api.brawlhalla.com/player/${id}/stats?api_key=${apiKey}`
-          )
+    const rawPlayers = await Promise.all(
+      ids.map((id) =>
+        fetchJson(
+          `https://api.brawlhalla.com/v1/ranked/${id}?api_key=${apiKey}`
         )
       )
-    ).filter(Boolean);
-
-    const players = rawPlayers.map(normalizePlayer);
-
-    players.sort((a, b) => b.elo - a.elo);
-
-    const ranked = players.map((p, index) => ({
-      position: index + 1,
-      ...p
-    }));
-
-    res.setHeader(
-      "Cache-Control",
-      "s-maxage=60, stale-while-revalidate=30"
     );
 
-    return res.status(200).json(ranked);
+    const players = rawPlayers
+      .filter(Boolean)
+      .map(normalizePlayer)
+      .sort((a, b) => b.elo - a.elo)
+      .map((p, i) => ({
+        position: i + 1,
+        ...p
+      }));
+
+    return res.status(200).json(players);
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+}
 }
