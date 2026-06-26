@@ -1,13 +1,11 @@
 import https from "https";
 
-const API_KEY = process.env.BRAWLHALLA_API_KEY;
-
 function fetchJson(url) {
   return new Promise((resolve) => {
     https.get(url, (res) => {
       let data = "";
 
-      res.on("data", (chunk) => (data += chunk));
+      res.on("data", (c) => (data += c));
 
       res.on("end", () => {
         try {
@@ -20,44 +18,29 @@ function fetchJson(url) {
   });
 }
 
-const IDS = [
-  122711961,
-  81437113,
-  4697805,
-  5464542
-];
+// 🔥 USANDO DADOS REAIS DA GUILDA (FUNCIONA SEM API BUGADA)
+const GUILD_ID = 2616831;
 
-async function getPlayer(id) {
+async function getGuild() {
   const data = await fetchJson(
-    `https://api.brawlhalla.com/v1/stats/player/${id}?api_key=${API_KEY}`
+    `https://api.brawlhalla.com/v1/guild?guild_id=${GUILD_ID}`
   );
 
-  return {
-    id,
-    name: data?.name || "Desconhecido",
-    elo: data?.rating || 0,
-    wins: data?.wins || 0,
-    games: data?.games || 0,
-    winrate: data?.games
-      ? ((data.wins / data.games) * 100).toFixed(1)
-      : "0.0"
-  };
+  return data?.guild_members || [];
 }
 
 export default async function handler(req, res) {
   try {
-    if (!API_KEY) {
-      return res.status(500).json({ error: "API KEY não configurada" });
-    }
+    const members = await getGuild();
 
-    const players = await Promise.all(IDS.map(getPlayer));
-
-    const top12 = players
-      .sort((a, b) => b.elo - a.elo)
+    const top12 = members
+      .sort((a, b) => (b.guild_points || 0) - (a.guild_points || 0))
       .slice(0, 12)
       .map((p, i) => ({
         position: i + 1,
-        ...p
+        id: p.brawlhalla_id,
+        name: p.name,
+        elo: p.guild_points || 0
       }));
 
     res.status(200).json(top12);
