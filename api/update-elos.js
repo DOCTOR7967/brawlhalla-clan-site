@@ -1,6 +1,23 @@
-module.exports = (req, res) => {
-  res.status(200).json([
-    { name: "TESTE 1", elo: 2000 },
-    { name: "TESTE 2", elo: 1800 }
-  ]);
-};
+const API_KEY = "A27820UWGN2V3AO4A0MI";
+
+function fetchJson(url) {
+  return new Promise((resolve) => {
+    https.get(url, {
+      headers: {
+        "Authorization": API_KEY
+      }
+    }, (res) => {
+      let data = "";
+
+      res.on("data", (c) => (data += c));
+
+      res.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          resolve(null);
+        }
+      });
+    }).on("error", () => resolve(null));
+  });
+}
