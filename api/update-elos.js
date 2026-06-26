@@ -5,7 +5,7 @@ function fetchJson(url) {
     https.get(url, (res) => {
       let data = "";
 
-      res.on("data", (chunk) => (data += chunk));
+      res.on("data", (c) => (data += c));
 
       res.on("end", () => {
         try {
@@ -18,16 +18,14 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 PEGA MEMBROS DA GUILDA (CORRETO AGORA)
-async function getGuildMembers() {
-  const data = await fetchJson(
-    "https://api.brawlhalla.com/v1/guild?guild_id=2616831"
-  );
+// 🔥 USE OS IDS REAIS DA SUA GUILDA
+const IDS = [
+  122711961,
+  81437113,
+  4697805,
+  5464542
+];
 
-  return data?.guild_members || [];
-}
-
-// 🔥 RANKED 1v1
 async function getRanked(id) {
   const data = await fetchJson(
     `https://api.brawlhalla.com/player/${id}/ranked`
@@ -47,18 +45,9 @@ async function getRanked(id) {
 
 module.exports = async (req, res) => {
   try {
-    const members = await getGuildMembers();
+    const players = await Promise.all(IDS.map(getRanked));
 
-    if (!members || members.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const ranked = await Promise.all(
-      members.map((m) => getRanked(m.brawlhalla_id))
-    );
-
-    const top12 = ranked
-      .filter((p) => p && p.elo > 0)
+    const top12 = players
       .sort((a, b) => b.elo - a.elo)
       .slice(0, 12)
       .map((p, i) => ({
