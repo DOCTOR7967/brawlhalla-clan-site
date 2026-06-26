@@ -1,390 +1,208 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NEXUS N GEN</title>
-
-  <style>
-    :root {
-      --bg: #0F172A;
-      --card: #1E293B;
-      --accent: #38BDF8;
-      --muted: #64748B;
-      --text: #94A3B8;
-      --white: #E2E8F0;
-    }
-
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(circle at top, #111c33 0%, var(--bg) 60%);
-      color: var(--text);
-    }
-
-    /* HEADER PREMIUM */
-    .header {
-      text-align: center;
-      padding: 50px 10px 30px;
-      position: relative;
-    }
-
-    /* card central */
-    .header-box {
-      display: inline-block;
-      padding: 25px 35px;
-      border-radius: 18px;
-
-      background: linear-gradient(135deg, #1E293B, #0F172A);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    }
-
-
-    .modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-  padding: 15px;
-}
-
-.modal-content {
-  background: #1E293B;
-  color: #E2E8F0;
-  width: 100%;
-  max-width: 420px;
-  max-height: 85vh;
-  overflow-y: auto;
-  border-radius: 14px;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.hidden {
-  display: none;
-}
-
-.close {
-  float: right;
-  cursor: pointer;
-  font-size: 22px;
-}
-
-.modal-content h2 {
-  color: #38BDF8;
-  margin-bottom: 10px;
-}
-
-.modal-content h3 {
-  color: #E2E8F0;
-  margin-top: 15px;
-}
-
-.modal-content hr {
-  border: 1px solid rgba(56, 189, 248, 0.2);
-}
-
-.modal-content p {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin: 15px 0;
-}
-
-.stats-grid div {
-  background: rgba(56, 189, 248, 0.08);
-  padding: 10px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-    /* avatar premium com anéis */
-    .avatar-wrapper {
-      position: relative;
-      width: 130px;
-      height: 130px;
-      margin: 0 auto;
-    }
-
-    .avatar-wrapper::before,
-    .avatar-wrapper::after {
-      content: "";
-      position: absolute;
-      inset: -6px;
-      border-radius: 50%;
-      border: 2px solid rgba(56, 189, 248, 0.25);
-    }
-
-    .avatar-wrapper::after {
-      inset: -14px;
-      border: 1px solid rgba(56, 189, 248, 0.12);
-    }
-
-    .clan-img {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid var(--accent);
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
-    }
-
-    /* nome estilo premium badge */
-    .clan-name {
-      margin-top: 15px;
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--white);
-
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
-    }
-
-    .clan-id {
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 1px;
-    }
-
-    /* RANKING */
-    .ranking {
-      width: 90%;
-      max-width: 850px;
-      margin: 30px auto;
-    }
-
-    .player {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      padding: 14px 16px;
-      margin-bottom: 10px;
-
-      background: linear-gradient(135deg, #1E293B, #0F172A);
-      border: 1px solid rgba(56, 189, 248, 0.12);
-      border-radius: 12px;
-
-      transition: 0.25s;
-    }
-
-    .player:hover {
-      transform: translateY(-2px);
-      border-color: rgba(56, 189, 248, 0.5);
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.08);
-    }
-
-    .left {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .pos {
-      font-weight: 700;
-      width: 35px;
-      color: var(--accent);
-    }
-
-    .name {
-      font-weight: 600;
-      color: var(--white);
-      letter-spacing: 0.5px;
-    }
-
-    .stats {
-      text-align: right;
-      font-size: 13px;
-      color: var(--text);
-    }
-
-    .stats strong {
-      color: var(--accent);
-      font-size: 14px;
-    }
-
-    button {
-  margin-top: 6px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #38BDF8;
-  color: #0F172A;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-button:hover {
-  transform: scale(1.05);
-  background: #0ea5e9;
-}
-
-@media (max-width: 480px) {
-  .modal-content {
-    max-width: 95%;
-    padding: 15px;
-    font-size: 14px;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
-  </style>
-</head>
-
-<body>
-
-  <!-- HEADER PREMIUM -->
-  <div class="header">
-    <div class="header-box">
-
-      <div class="avatar-wrapper">
-        <img class="clan-img" src="https://i.ibb.co/j99HXdC4/clan.jpg" alt="Clã">
-      </div>
-
-      <div class="clan-name">NEXUS N GEN</div>
-      <div class="clan-id">ID 2616831</div>
-
-    </div>
-  </div>
-
-  <!-- RANKING -->
-  <div class="ranking" id="ranking"></div>
-
-  <script>
-async function loadGuild() {
-  try {
-    const res = await fetch("https://api.brawlhalla.com/v1/guild/members?guild_id=2616831");
-
-    const json = await res.json();
-
-    console.log(json);
-
-    const data = json.guild_members; // 🔥 AQUI ESTÁ A SOLUÇÃO
-
-    const container = document.getElementById("ranking");
-
-    container.innerHTML = data
-      .sort((a, b) => a.rank.localeCompare(b.rank)) // opcional
-      .map((m, index) => `
-        <div class="player">
-          <div class="left">
-            <div class="pos">#${index + 1}</div>
-            <div class="name">${m.name}</div>
-          </div>
-
-          <div class="stats">
-            ID: ${m.brawlhalla_id}<br>
-            Rank: ${m.rank}<br>
-
-            <button onclick="openProfile(${m.brawlhalla_id})">
-              Ver perfil
-            </button>
-          </div>
-        </div>
-      `)
-      .join("");
-
-  } catch (err) {
-    console.error(err);
-
-    document.getElementById("ranking").innerHTML = `
-      <div class="error">
-        Erro ao carregar guilda
-      </div>
-    `;
-  }
-}
-
-async function openProfile(id) {
-  const modal = document.getElementById("profileModal");
-  const content = document.getElementById("profileContent");
-
-  modal.classList.remove("hidden");
-  content.innerHTML = "Carregando...";
-
-  try {
-    const res = await fetch(`https://api.brawlhalla.com/v1/player/stats?brawlhalla_id=${id}`);
-
-    const data = await res.json();
-
-    console.log(data);
-
-    content.innerHTML = `
-  <h2>${data.name}</h2>
-
-  <div class="stats-grid">
-    <div><strong>Level</strong><br>${data.level}</div>
-    <div><strong>Winrate</strong><br>${
-      data.games ? ((data.wins / data.games) * 100).toFixed(1) : 0
-    }%</div>
-    <div><strong>Games</strong><br>${data.games}</div>
-    <div><strong>Wins</strong><br>${data.wins}</div>
-  </div>
-
-  <button onclick="toggleDetails()">Ver detalhes</button>
-
-  <div id="details" class="hidden">
-    <hr>
-<div class="stats-grid">
-    <div><strong>XP</strong><br>${data.xp.toLocaleString()}</div>
-    <div><strong>Damage (Top)</strong><br><p>Bomb: ${data.damage_bomb}<br>
-    Mine: ${data.damage_mine}</p></div>
-    <div><strong>KOs</strong><br><p>Bomb: ${data.ko_bomb}<br>
-    Mine: ${data.ko_mine}<br>
-      Spikeball: ${data.ko_spikeball}</p></div>
-  </div>
-  </div>
-`;
-
-  } catch (err) {
-    content.innerHTML = "Erro ao carregar perfil";
-  }
-}
-
-function toggleDetails() {
-  const el = document.getElementById("details");
-
-  if (!el) return;
-
-  el.classList.toggle("hidden");
-}
-function closeProfile() {
-  document.getElementById("profileModal").classList.add("hidden");
-}
-
-loadGuild();
-</script>
-
-<div id="profileModal" class="modal hidden">
-  <div class="modal-content">
-    <span class="close" onclick="closeProfile()">&times;</span>
-
-    <div id="profileContent">Carregando...</div>
-  </div>
-</div>
-</body>
-</html>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <title>NEXUS N GEN</title>
+
+        <style>
+            :root {
+                  --bg: #0F172A;
+                        --card: #1E293B;
+                              --accent: #38BDF8;
+                                    --muted: #64748B;
+                                          --text: #94A3B8;
+                                                --white: #E2E8F0;
+                                                    }
+
+                                                        body {
+                                                              margin: 0;
+                                                                    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+                                                                          background: radial-gradient(circle at top, #111c33 0%, var(--bg) 60%);
+                                                                                color: var(--text);
+                                                                                    }
+
+                                                                                        /* HEADER PREMIUM */
+                                                                                            .header {
+                                                                                                  text-align: center;
+                                                                                                        padding: 50px 10px 30px;
+                                                                                                              position: relative;
+                                                                                                                  }
+
+                                                                                                                      /* card central */
+                                                                                                                          .header-box {
+                                                                                                                                display: inline-block;
+                                                                                                                                      padding: 25px 35px;
+                                                                                                                                            border-radius: 18px;
+
+                                                                                                                                                  background: linear-gradient(135deg, #1E293B, #0F172A);
+                                                                                                                                                        border: 1px solid rgba(56, 189, 248, 0.25);
+                                                                                                                                                              box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+                                                                                                                                                                  }
+
+                                                                                                                                                                      /* avatar premium com anéis */
+                                                                                                                                                                          .avatar-wrapper {
+                                                                                                                                                                                position: relative;
+                                                                                                                                                                                      width: 130px;
+                                                                                                                                                                                            height: 130px;
+                                                                                                                                                                                                  margin: 0 auto;
+                                                                                                                                                                                                      }
+
+                                                                                                                                                                                                          .avatar-wrapper::before,
+                                                                                                                                                                                                              .avatar-wrapper::after {
+                                                                                                                                                                                                                    content: "";
+                                                                                                                                                                                                                          position: absolute;
+                                                                                                                                                                                                                                inset: -6px;
+                                                                                                                                                                                                                                      border-radius: 50%;
+                                                                                                                                                                                                                                            border: 2px solid rgba(56, 189, 248, 0.25);
+                                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                                    .avatar-wrapper::after {
+                                                                                                                                                                                                                                                          inset: -14px;
+                                                                                                                                                                                                                                                                border: 1px solid rgba(56, 189, 248, 0.12);
+                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                        .clan-img {
+                                                                                                                                                                                                                                                                              width: 130px;
+                                                                                                                                                                                                                                                                                    height: 130px;
+                                                                                                                                                                                                                                                                                          border-radius: 50%;
+                                                                                                                                                                                                                                                                                                object-fit: cover;
+                                                                                                                                                                                                                                                                                                      border: 2px solid var(--accent);
+                                                                                                                                                                                                                                                                                                            box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+                                                                                                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                                                                                                    /* nome estilo premium badge */
+                                                                                                                                                                                                                                                                                                                        .clan-name {
+                                                                                                                                                                                                                                                                                                                              margin-top: 15px;
+                                                                                                                                                                                                                                                                                                                                    font-size: 26px;
+                                                                                                                                                                                                                                                                                                                                          font-weight: 700;
+                                                                                                                                                                                                                                                                                                                                                letter-spacing: 2px;
+                                                                                                                                                                                                                                                                                                                                                      text-transform: uppercase;
+                                                                                                                                                                                                                                                                                                                                                            color: var(--white);
+
+                                                                                                                                                                                                                                                                                                                                                                  display: inline-block;
+                                                                                                                                                                                                                                                                                                                                                                        padding: 6px 14px;
+                                                                                                                                                                                                                                                                                                                                                                              border-radius: 999px;
+
+                                                                                                                                                                                                                                                                                                                                                                                    background: rgba(56, 189, 248, 0.08);
+                                                                                                                                                                                                                                                                                                                                                                                          border: 1px solid rgba(56, 189, 248, 0.25);
+                                                                                                                                                                                                                                                                                                                                                                                                box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);
+                                                                                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                                                                                        .clan-id {
+                                                                                                                                                                                                                                                                                                                                                                                                              margin-top: 8px;
+                                                                                                                                                                                                                                                                                                                                                                                                                    font-size: 12px;
+                                                                                                                                                                                                                                                                                                                                                                                                                          color: var(--muted);
+                                                                                                                                                                                                                                                                                                                                                                                                                                letter-spacing: 1px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                        /* RANKING */
+                                                                                                                                                                                                                                                                                                                                                                                                                                            .ranking {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                  width: 90%;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        max-width: 850px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              margin: 30px auto;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                  }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      .player {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            display: flex;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  justify-content: space-between;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        align-items: center;
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              padding: 14px 16px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    margin-bottom: 10px;
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          background: linear-gradient(135deg, #1E293B, #0F172A);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                border: 1px solid rgba(56, 189, 248, 0.12);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      border-radius: 12px;
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            transition: 0.25s;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .player:hover {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          transform: translateY(-2px);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                border-color: rgba(56, 189, 248, 0.5);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.08);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              .left {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    display: flex;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          gap: 12px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                align-items: center;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        .pos {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              font-weight: 700;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    width: 35px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          color: var(--accent);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .name {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        font-weight: 600;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              color: var(--white);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    letter-spacing: 0.5px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            .stats {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  text-align: right;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        font-size: 13px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              color: var(--text);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      .stats strong {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            color: var(--accent);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  font-size: 14px;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </style>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </head>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <body>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <!-- HEADER PREMIUM -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="header">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="header-box">
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <div class="avatar-wrapper">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              <img class="clan-img" src="https://i.ibb.co/j99HXdC4/clan.jpg" alt="Clã">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <div class="clan-name">NEXUS N GEN</div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="clan-id">ID 2616831</div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <!-- RANKING -->
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          <div class="ranking" id="ranking"></div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <script>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                async function loadRanking() {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      const res = await fetch("/api/update-elos");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            const data = await res.json();
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  const top12 = data.slice(0, 12);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        const container = document.getElementById("ranking");
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              container.innerHTML = top12.map(p => `
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      <div class="player">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="left">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="pos">#${p.position}</div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="name">${p.name}</div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  </div>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="stats">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <strong>${p.elo}</strong> Elo<br/>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    WR: ${p.winrate}%
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `).join("");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                }
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    loadRanking();
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </script>
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </body>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      </html>
 
 
 
