@@ -1,4 +1,4 @@
-const https = require("https");
+import https from "https";
 
 function fetchJson(url) {
   return new Promise((resolve) => {
@@ -18,7 +18,7 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 LISTA FIXA (FUNCIONA SEM FALHAR)
+// 🔥 IDS FIXOS
 const IDS = [
   122711961,
   81437113,
@@ -26,7 +26,6 @@ const IDS = [
   5464542
 ];
 
-// 🔥 PEGA RANKED (com fallback seguro)
 async function getRanked(id) {
   const data = await fetchJson(
     `https://api.brawlhalla.com/player/${id}/ranked`
@@ -44,8 +43,7 @@ async function getRanked(id) {
   };
 }
 
-// 🔥 VERCEL FUNCTION (IMPORTANTE)
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
     const players = await Promise.all(IDS.map(getRanked));
 
@@ -61,4 +59,4 @@ module.exports = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
+}
