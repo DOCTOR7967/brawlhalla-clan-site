@@ -1,55 +1,62 @@
-const https = require("https");
+import https from "https";
 
 function fetchJson(url) {
   return new Promise((resolve) => {
-    https
-      .get(url, (res) => {
-        let data = "";
+    https.get(url, (res) => {
+      let data = "";
 
-        res.on("data", (chunk) => (data += chunk));
+      res.on("data", (chunk) => (data += chunk));
 
-        res.on("end", () => {
-          try {
-            resolve(JSON.parse(data));
-          } catch (e) {
-            resolve(null);
-          }
-        });
-      })
-      .on("error", () => resolve(null));
+      res.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          resolve(null);
+        }
+      });
+    }).on("error", () => resolve(null));
   });
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   try {
-    const url =
-      "https://api.brawlhalla.com/v1/guild?guild_id=2616831";
+    const apiKey = process.env.BRAWLHALLA_API_KEY;
 
-    const data = await fetchJson(url);
-
-    const members = data?.guild_members;
-
-    if (!members || members.length === 0) {
-      return res.status(200).json([]);
+    if (!apiKey) {
+      return res.status(500).json({ error: "API key não encontrada no Vercel" });
     }
 
-    const ranking = members
-      .map((p) => ({
-        id: p.brawlhalla_id,
-        name: p.name || "Unknown",
-        score: p.guild_points || 0
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 12)
+    const ids = (req.query.ids || "81437113").split(",");
+
+    const players = await Promise.all(
+      ids.map(async (id) => {
+        const ranked = await fetchJson(
+          `https://api.brawlhalla.com/ranked/${id}?api_key=${apiKey}`
+        );
+
+        return {
+          id,
+          name: ranked?.name || "Desconhecido",
+          elo: ranked?.rating || 0,
+          wins: ranked?.wins || 0,
+          games: ranked?.games || 0,
+          winrate: ranked?.games
+            ? ((ranked.wins / ranked.games) * 100).toFixed(1)
+            : "0.0"
+        };
+      })
+    );
+
+    const sorted = players
+      .filter((p) => p.name !== "Desconhecido")
+      .sort((a, b) => b.elo - a.elo)
       .map((p, i) => ({
         position: i + 1,
         ...p
       }));
 
-    return res.status(200).json(ranking);
+    return res.status(200).json(sorted);
   } catch (err) {
-    return res.status(500).json({
-      error: err.message
-    });
+    return res.status(500).json({ error: err.message });
   }
-};
+}
