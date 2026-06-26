@@ -18,6 +18,16 @@ function fetchJson(url) {
   });
 }
 
+// 🔥 pega membros da guilda REAL
+async function getGuildMembers(guildId) {
+  const data = await fetchJson(
+    `https://api.brawlhalla.com/v1/guild/${guildId}`
+  );
+
+  return data?.guild?.members || [];
+}
+
+// 🔥 ranked 1v1 real
 async function getRanked(id) {
   const data = await fetchJson(
     `https://api.brawlhalla.com/player/${id}/ranked`
@@ -27,7 +37,6 @@ async function getRanked(id) {
     id,
     name: data?.name || "Desconhecido",
     elo: data?.rating || 0,
-    peak: data?.peak_rating || 0,
     wins: data?.wins || 0,
     games: data?.games || 0,
     winrate: data?.games
@@ -38,12 +47,20 @@ async function getRanked(id) {
 
 export default async function handler(req, res) {
   try {
-    // 🔥 IDs da sua guilda (você pode depois puxar automático)
-    const ids = ["81437113", "4697805", "5464542"];
+    const guildId = "2616831"; // seu clã
 
-    const players = await Promise.all(ids.map(getRanked));
+    const members = await getGuildMembers(guildId);
 
-    const top12 = players
+    if (!members.length) {
+      return res.status(200).json([]);
+    }
+
+    const ranked = await Promise.all(
+      members.map((m) => getRanked(m.brawlhalla_id))
+    );
+
+    const top12 = ranked
+      .filter(p => p && p.elo > 0)
       .sort((a, b) => b.elo - a.elo)
       .slice(0, 12)
       .map((p, i) => ({
