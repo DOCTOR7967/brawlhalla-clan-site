@@ -1,77 +1,62 @@
 const https = require("https");
 
-const DEFAULT_IDS = ["81437113"]; // adicione mais IDs aqui depois
-
 function fetchJson(url) {
   return new Promise((resolve) => {
-    https
-      .get(url, (resp) => {
-        let data = "";
+    https.get(url, (res) => {
+      let data = "";
 
-        resp.on("data", (chunk) => {
-          data += chunk;
-        });
+      res.on("data", (chunk) => (data += chunk));
 
-        resp.on("end", () => {
-          try {
-            if (resp.statusCode !== 200) {
-              console.log("Erro API:", data);
-              resolve(null);
-              return;
-            }
-
-            resolve(JSON.parse(data));
-          } catch (e) {
-            resolve(null);
-          }
-        });
-      })
-      .on("error", () => resolve(null));
+      res.on("end", () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch {
+          resolve(null);
+        }
+      });
+    }).on("error", () => resolve(null));
   });
 }
 
-function normalizePlayer(p) {
+// 🔥 pega membros da guilda
+async function getGuildMembers(guildId) {
+  const url = `https://api.brawlhalla.com/v1/guild/${guildId}`;
+  const data = await fetchJson(url);
+  return data?.guild?.members || [];
+}
+
+// 🔥 pega ranked 1v1
+async function getRanked(id) {
+  const url = `https://api.brawlhalla.com/player/${id}/ranked`;
+  const data = await fetchJson(url);
+
   return {
-    id: p?.brawlhalla_id,
-    name: p?.name || "Unknown",
-    elo: p?.rating || 0,
-    peakElo: p?.peak_rating || 0,
-    tier: p?.tier || "N/A",
-    region: p?.region || "N/A",
-    wins: p?.wins || 0,
-    games: p?.games || 0,
-    winrate: p?.games ? ((p.wins / p.games) * 100).toFixed(2) : "0.00"
+    id,
+    name: data?.name || "Desconhecido",
+    elo: data?.rating || 0,
+    peak: data?.peak_rating || 0,
+    wins: data?.wins || 0,
+    games: data?.games || 0,
+    winrate: data?.games ? ((data.wins / data.games) * 100).toFixed(1) : "0.0"
   };
 }
 
-async function getRankedPlayers(ids = DEFAULT_IDS) {
-  const apiKey = process.env.BRAWLHALLA_API_KEY;
+// 🔥 função principal
+async function getTop12Guild(guildId = "2616831") {
+  const members = await getGuildMembers(guildId);
 
-  const idList = Array.isArray(ids)
-    ? ids
-    : String(ids).split(",");
-
-  const rawPlayers = await Promise.all(
-    idList.map((id) =>
-      fetchJson(
-        `https://api.brawlhalla.com/player/${id}/ranked?api_key=${apiKey}`
-      )
-    )
+  const rankedPlayers = await Promise.all(
+    members.map((m) => getRanked(m.brawlhalla_id))
   );
 
-  const players = rawPlayers
-    .filter(Boolean)
-    .map(normalizePlayer)
+  return rankedPlayers
+    .filter((p) => p && p.elo > 0)
     .sort((a, b) => b.elo - a.elo)
-    .slice(0, 12) // 🔥 TOP 12
-    .map((player, index) => ({
+    .slice(0, 12)
+    .map((p, index) => ({
       position: index + 1,
-      ...player
+      ...p
     }));
-
-  return players;
 }
 
-module.exports = {
-  getRankedPlayers
-};
+module.exports = { getTop12Guild };
