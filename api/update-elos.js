@@ -1,5 +1,7 @@
 import https from "https";
 
+const API_KEY = "A27820UWGN2V3AO4A0MI";
+
 function fetchJson(url) {
   return new Promise((resolve) => {
     https.get(url, (res) => {
@@ -18,7 +20,7 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 IDS FIXOS
+// 🔥 IDS DA SUA GUILDA
 const IDS = [
   122711961,
   81437113,
@@ -26,9 +28,10 @@ const IDS = [
   5464542
 ];
 
-async function getRanked(id) {
+// 🔥 PEGA STATS COM API KEY
+async function getPlayer(id) {
   const data = await fetchJson(
-    `https://api.brawlhalla.com/player/${id}/ranked`
+    `https://api.brawlhalla.com/v1/stats/player/${id}?api_key=${API_KEY}`
   );
 
   return {
@@ -45,7 +48,7 @@ async function getRanked(id) {
 
 export default async function handler(req, res) {
   try {
-    const players = await Promise.all(IDS.map(getRanked));
+    const players = await Promise.all(IDS.map(getPlayer));
 
     const top12 = players
       .sort((a, b) => b.elo - a.elo)
