@@ -38,7 +38,7 @@ async function getRanked(id) {
 
 export default async function handler(req, res) {
   try {
-    // 🔥 lista fixa (depois você pode trocar por guild API)
+    // 🔥 IDs da sua guilda (você pode depois puxar automático)
     const ids = ["81437113", "4697805", "5464542"];
 
     const players = await Promise.all(ids.map(getRanked));
