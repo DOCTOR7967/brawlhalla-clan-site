@@ -18,7 +18,6 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 USANDO DADOS REAIS DA GUILDA (FUNCIONA SEM API BUGADA)
 const GUILD_ID = 2616831;
 
 async function getGuild() {
@@ -33,14 +32,18 @@ export default async function handler(req, res) {
   try {
     const members = await getGuild();
 
+    if (!members.length) {
+      return res.status(200).json([]);
+    }
+
     const top12 = members
       .sort((a, b) => (b.guild_points || 0) - (a.guild_points || 0))
       .slice(0, 12)
       .map((p, i) => ({
         position: i + 1,
         id: p.brawlhalla_id,
-        name: p.name,
-        elo: p.guild_points || 0
+        name: p.name || "Desconhecido",
+        score: p.guild_points || 0
       }));
 
     res.status(200).json(top12);
