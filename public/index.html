@@ -1,190 +1,129 @@
-<!DOCTYPE html>  <html lang="pt-br">  
-<head>  
-  <meta charset="UTF-8" />  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-  <title>NEXUS N GEN</title>    <style>  
-    :root {  
-      --bg: #0F172A;  
-      --card: #1E293B;  
-      --accent: #38BDF8;  
-      --muted: #64748B;  
-      --text: #94A3B8;  
-      --white: #E2E8F0;  
-    }  
-  
-    body {  
-      margin: 0;  
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;  
-      background: radial-gradient(circle at top, #111c33 0%, var(--bg) 60%);  
-      color: var(--text);  
-    }  
-  
-    /* HEADER PREMIUM */  
-    .header {  
-      text-align: center;  
-      padding: 50px 10px 30px;  
-      position: relative;  
-    }  
-  
-    /* card central */  
-    .header-box {  
-      display: inline-block;  
-      padding: 25px 35px;  
-      border-radius: 18px;  
-  
-      background: linear-gradient(135deg, #1E293B, #0F172A);  
-      border: 1px solid rgba(56, 189, 248, 0.25);  
-      box-shadow: 0 10px 40px rgba(0,0,0,0.4);  
-    }  
-  
-    /* avatar premium com anéis */  
-    .avatar-wrapper {  
-      position: relative;  
-      width: 130px;  
-      height: 130px;  
-      margin: 0 auto;  
-    }  
-  
-    .avatar-wrapper::before,  
-    .avatar-wrapper::after {  
-      content: "";  
-      position: absolute;  
-      inset: -6px;  
-      border-radius: 50%;  
-      border: 2px solid rgba(56, 189, 248, 0.25);  
-    }  
-  
-    .avatar-wrapper::after {  
-      inset: -14px;  
-      border: 1px solid rgba(56, 189, 248, 0.12);  
-    }  
-  
-    .clan-img {  
-      width: 130px;  
-      height: 130px;  
-      border-radius: 50%;  
-      object-fit: cover;  
-      border: 2px solid var(--accent);  
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);  
-    }  
-  
-    /* nome estilo premium badge */  
-    .clan-name {  
-      margin-top: 15px;  
-      font-size: 26px;  
-      font-weight: 700;  
-      letter-spacing: 2px;  
-      text-transform: uppercase;  
-      color: var(--white);  
-  
-      display: inline-block;  
-      padding: 6px 14px;  
-      border-radius: 999px;  
-  
-      background: rgba(56, 189, 248, 0.08);  
-      border: 1px solid rgba(56, 189, 248, 0.25);  
-      box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.1);  
-    }  
-  
-    .clan-id {  
-      margin-top: 8px;  
-      font-size: 12px;  
-      color: var(--muted);  
-      letter-spacing: 1px;  
-    }  
-  
-    /* RANKING */  
-    .ranking {  
-      width: 90%;  
-      max-width: 850px;  
-      margin: 30px auto;  
-    }  
-  
-    .player {  
-      display: flex;  
-      justify-content: space-between;  
-      align-items: center;  
-  
-      padding: 14px 16px;  
-      margin-bottom: 10px;  
-  
-      background: linear-gradient(135deg, #1E293B, #0F172A);  
-      border: 1px solid rgba(56, 189, 248, 0.12);  
-      border-radius: 12px;  
-  
-      transition: 0.25s;  
-    }  
-  
-    .player:hover {  
-      transform: translateY(-2px);  
-      border-color: rgba(56, 189, 248, 0.5);  
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.08);  
-    }  
-  
-    .left {  
-      display: flex;  
-      gap: 12px;  
-      align-items: center;  
-    }  
-  
-    .pos {  
-      font-weight: 700;  
-      width: 35px;  
-      color: var(--accent);  
-    }  
-  
-    .name {  
-      font-weight: 600;  
-      color: var(--white);  
-      letter-spacing: 0.5px;  
-    }  
-  
-    .stats {  
-      text-align: right;  
-      font-size: 13px;  
-      color: var(--text);  
-    }  
-  
-    .stats strong {  
-      color: var(--accent);  
-      font-size: 14px;  
-    }  
-  </style>  </head>  <body>    <!-- HEADER PREMIUM -->    <div class="header">  
-    <div class="header-box">  <div class="avatar-wrapper">  
-    <img class="clan-img" src="https://i.ibb.co/j99HXdC4/clan.jpg" alt="Clã">  
-  </div>  
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-  <div class="clan-name">NEXUS N GEN</div>  
-  <div class="clan-id">ID 2616831</div>  
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-</div>
+<title>NEXUS N GEN</title>
 
-  </div>    <!-- RANKING -->    <div class="ranking" id="ranking"></div>    <script>  
-    async function loadRanking() {  
-      const res = await fetch("/api/update-elos");  
-      const data = await res.json();  
-  
-      const top12 = data.slice(0, 12);  
-      const container = document.getElementById("ranking");  
-  
-      container.innerHTML = top12.map(p => `  
-        <div class="player">  
-          <div class="left">  
-            <div class="pos">#${p.position}</div>  
-            <div class="name">${p.name}</div>  
-          </div>  
-  
-          <div class="stats">  
-            <strong>${p.elo}</strong> Elo<br/>  
-            WR: ${p.winrate}%  
-          </div>  
-        </div>  
-      `).join("");  
-    }  
-  
-    loadRanking();  
-  </script>  </body>  
-</html>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+:root{
+
+--bg:#0F172A;
+--bg2:#162544;
+
+--card:#1E293B;
+--card2:#26364D;
+
+--accent:#38BDF8;
+--accent2:#0EA5E9;
+
+--text:#E2E8F0;
+--muted:#94A3B8;
+
+--border:#334155;
+
+--silver:#CBD5E1;
+--gray:#64748B;
+
+--glow:rgba(56,189,248,.22);
+
+}
+
+body{
+
+font-family:Inter,sans-serif;
+
+background:
+radial-gradient(circle at top,var(--bg2) 0%,var(--bg) 65%);
+
+color:var(--text);
+
+overflow-x:hidden;
+
+}
+
+.hero{
+
+padding:60px 20px 40px;
+
+text-align:center;
+
+border-bottom:1px solid var(--border);
+
+}
+
+.hero h1{
+
+font-family:Cinzel,serif;
+
+font-size:52px;
+
+font-weight:900;
+
+letter-spacing:5px;
+
+background:linear-gradient(#E2E8F0,#38BDF8);
+
+-webkit-background-clip:text;
+
+-webkit-text-fill-color:transparent;
+
+}
+
+.hero p{
+
+margin-top:12px;
+
+font-family:Cinzel,serif;
+
+letter-spacing:3px;
+
+color:var(--muted);
+
+}
+
+.badge{
+
+display:inline-block;
+
+margin-top:20px;
+
+padding:8px 18px;
+
+border-radius:30px;
+
+background:rgba(56,189,248,.08);
+
+border:1px solid rgba(56,189,248,.25);
+
+color:var(--accent);
+
+font-size:11px;
+
+letter-spacing:2px;
+
+}
+
+.wrapper{
+
+max-width:1100px;
+
+margin:auto;
+
+padding:35px 20px;
+
+}
 
 
 
