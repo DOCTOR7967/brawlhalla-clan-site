@@ -1,6 +1,6 @@
 import https from "https";
 
-const API_KEY = "A27820UWGN2V3AO4A0MI";
+const API_KEY = process.env.BRAWLHALLA_API_KEY;
 
 function fetchJson(url) {
   return new Promise((resolve) => {
@@ -20,7 +20,6 @@ function fetchJson(url) {
   });
 }
 
-// 🔥 IDS DA SUA GUILDA
 const IDS = [
   122711961,
   81437113,
@@ -28,7 +27,6 @@ const IDS = [
   5464542
 ];
 
-// 🔥 PEGA STATS COM API KEY
 async function getPlayer(id) {
   const data = await fetchJson(
     `https://api.brawlhalla.com/v1/stats/player/${id}?api_key=${API_KEY}`
@@ -48,6 +46,10 @@ async function getPlayer(id) {
 
 export default async function handler(req, res) {
   try {
+    if (!API_KEY) {
+      return res.status(500).json({ error: "API KEY não configurada" });
+    }
+
     const players = await Promise.all(IDS.map(getPlayer));
 
     const top12 = players
